@@ -1,0 +1,107 @@
+E0 : {
+    int value
+}
+E : {
+    int value
+}
+E1: {
+    int value
+}
+T# : {
+    int value
+}
+T1 : {
+    int value
+}
+F# : {
+    int value
+}
+
+E0 -> E @after :
+    void post(E0 e0, E e) {
+        e0.value = e.value;
+    } #
+E -> T E1 @after :
+    void post(E e, T t, E1 e1) {
+        e.value = e1.value;
+        t.value = e.value;
+    } #
+E1 -> add T E1 @inside2 :
+    void in(E1 e, T t, T t_inh) {
+        t.value += t_inh.value;
+    } # @after :
+    void post(E1 e0, T t0, E1 e1, T t_inh) {
+        if (e1.value == 0) {
+            e0.value = t0.value;
+        } else {
+            e0.value = e1.value;
+        }
+    } #
+E1 -> sub T E1 @inside2 :
+    void in(E1 e, T t, T t_inh) {
+        t.value = t_inh.value - t.value;
+    } # @after :
+    void post(E1 e0, T t0, E1 e1, T t_inh) {
+        if (e1.value == 0) {
+            e0.value = t0.value;
+        } else {
+            e0.value = e1.value;
+        }
+    } #
+E1 -> \\eps @after :
+    void post(E1 e0, T t_inh) {
+        e0.value = t_inh.value;
+    } #
+T -> F T1 @after :
+    void post(T t, F f0, T1 t1) {
+        t.value = t1.value;
+        f0.value = t.value;
+    } #
+T1 -> mul F T1 @inside2 :
+    void in(T1 t0, F f0, F f_inh) {
+        f0.value *= f_inh.value;
+    } # @after :
+    void post(T1 t0, F f0, T1 t1, F f_inh) {
+        if (t1.value == 0) {
+            t0.value = f0.value;
+        } else {
+            t0.value = t1.value;
+        }
+    } #
+T1 -> div F T1 @inside2 :
+    void in(T1 t0, F f0, F f_inh) {
+        f0.value = f_inh.value / f0.value;
+    } # @after :
+    void post(T1 t0, F f0, T1 t1, F f_inh) {
+        if (t1.value == 0) {
+            t0.value = f0.value;
+        } else {
+            t0.value = t1.value;
+        }
+    } #
+T1 -> \\eps @after :
+    void post(T1 t0, F f_inh) {
+        t0.value = f_inh.value;
+    } #
+F -> number @after :
+    void pre(F f, String termValue) {
+        f.value = Integer.parseInt(termValue);
+    } #
+F -> lparen E rparen @after :
+    void post(F f, E e) {
+        f.value = e.value;
+    } #
+F -> func lparen E rparen @after :
+    void post(F f, E e) {
+        f.value = (int) Math.sqrt((double) e.value);
+    } #
+F -> \\eps
+
+add : +
+sub : -
+mul : *
+div : /
+lparen : (
+rparen : )
+number : \\reg[0-9][0-9]*
+func : \\reg[$-$][a-zA-Z.-.]*

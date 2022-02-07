@@ -1,0 +1,33 @@
+E0 : {}
+E : {}
+E1 : {}
+T : {}
+T1 : {}
+F : {}
+F1 : {}
+G : {}
+H : {}
+
+E0 -> E
+E0 -> \\eps
+E -> T E1
+E1 -> or T E1
+E1 -> \\eps
+T -> F T1
+T1 -> xor F T1
+T1 -> \\eps
+F -> G F1
+F1 -> and G F1
+F1 -> \\eps
+G -> neg H
+G -> H
+H -> var
+H -> lparen E rparen
+
+lparen : (
+rparen : )
+or : |
+xor : ^
+and : &
+neg : !
+var : \\reg[a-zA-Z][a-zA-Z0-9]*
